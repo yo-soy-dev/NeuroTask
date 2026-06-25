@@ -134,3 +134,26 @@ Then open [http://localhost:3000](http://localhost:3000)
 **Backend:** Node.js, Express.js, MongoDB, Mongoose, JWT, bcryptjs, express-validator
 
 **Frontend:** React 18, React Router v6, Axios, Recharts, React Hot Toast, date-fns
+
+## Assignment Requirements Checklist
+
+- [x] JWT Authentication (Login / Register)
+- [x] Role-Based Access Control (Admin & Employee)
+- [x] Dashboard with task statistics
+- [x] Complete Task CRUD (Create, Read, Update, Delete)
+- [x] User Management (Admin only)
+- [x] Search, Filter & Pagination
+- [x] Proper API structure with validation
+- [x] Responsive UI
+- [x] Clean folder structure and reusable components
+- [x] Proper error handling
+
+## Live Demo
+
+[View Live App](https://task-flow-xi-hazel.vercel.app)
+
+## Environment Variables
+
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret_key
+PORT=5000
