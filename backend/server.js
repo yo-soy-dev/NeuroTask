@@ -9,6 +9,9 @@ import { errorHandler, notFound } from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import commentRoutes from './routes/commentRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import activityRoutes from './routes/activityRoutes.js';
 
 // Connect to MongoDB
 connectDB();
@@ -39,6 +42,9 @@ app.get('/', (req, res) => {
       auth: '/api/auth',
       tasks: '/api/tasks',
       users: '/api/users',
+      comments: '/api/comments',
+      notifications: '/api/notifications',
+      activity: '/api/activity',
     },
   });
 });
@@ -48,6 +54,10 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/activity', activityRoutes);
+
 
 // Error Handling
 app.use(notFound);

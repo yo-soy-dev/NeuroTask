@@ -64,6 +64,8 @@
 
 html {
     font-size: 16px;
+     -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 body {
@@ -73,6 +75,7 @@ body {
     min-height: 100vh;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
 
 a {
@@ -162,6 +165,7 @@ ul {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 .sidebar-logo-icon {
@@ -192,6 +196,8 @@ ul {
     flex: 1;
     padding: 12px 0;
     overflow-y: auto;
+     overflow-x: hidden;
+    min-height: 0;
 }
 
 .nav-section {
@@ -257,6 +263,8 @@ ul {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
+    background: var(--bg-secondary);
 }
 
 .avatar {
@@ -313,6 +321,7 @@ ul {
     padding: 4px;
     cursor: pointer;
     transition: color var(--transition);
+    flex-shrink: 0;
 }
 
 .logout-btn:hover {
@@ -339,7 +348,9 @@ ul {
 .header-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
+    min-width: 0; 
+    flex: 1; 
 }
 
 .header-title {
@@ -347,17 +358,20 @@ ul {
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.2;
+    white-space: nowrap;
 }
 
 .header-sub {
     font-size: 0.75rem;
     color: var(--text-muted);
+    white-space: nowrap;
 }
 
 .header-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    flex-shrink: 0;
 }
 
 .header-badge {
@@ -371,6 +385,7 @@ ul {
     padding: 4px 12px;
     border-radius: 20px;
     border: 1px solid var(--accent-glow);
+    white-space: nowrap;
 }
 
 .header-badge-dot {
@@ -379,6 +394,7 @@ ul {
     border-radius: 50%;
     background: var(--accent-light);
     animation: pulse 2s infinite;
+    flex-shrink: 0; 
 }
 
 .header-avatar {
@@ -392,6 +408,7 @@ ul {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0; 
 }
 
 .header-subtitle {
@@ -405,11 +422,14 @@ ul {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 32px;
+    padding: 14px 32px;
     border-top: 1px solid var(--border);
     font-size: 0.75rem;
     color: var(--text-muted);
     background: var(--bg-secondary);
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 /* ── Cards ──────────────────────────────────────── */
@@ -625,12 +645,14 @@ ul {
 /* ── Table ──────────────────────────────────────── */
 .table-wrapper {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    min-width: 500px;
 }
 
 .table th {
@@ -642,6 +664,7 @@ ul {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 1px solid var(--border);
+     white-space: nowrap;
 }
 
 .table td {
@@ -807,6 +830,7 @@ ul {
     display: flex;
     align-items: center;
     gap: 6px;
+    flex-wrap: wrap;
 }
 
 .page-btn {
@@ -853,7 +877,7 @@ ul {
 .search-input-wrap {
     position: relative;
     flex: 1;
-    min-width: 200px;
+    min-width: 180px;
 }
 
 .search-input-wrap .search-icon {
@@ -894,6 +918,9 @@ ul {
 .auth-logo {
     text-align: center;
     margin-bottom: 32px;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
 }
 
 .auth-logo-icon {
@@ -1090,19 +1117,51 @@ ul {
 }
 
 /* ── Responsive ─────────────────────────────────── */
-@media (max-width: 768px) {
+@media (max-width: 1024px) and (min-width: 769px) {
+    :root {
+        --sidebar-w: 200px;
+    }
+    .page-content { padding: 20px 24px; }
+    .header { padding: 0 20px; }
+    .app-footer { padding: 12px 24px; }
+    .stat-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+    .stat-card-value { font-size: 22px; }
+    .header-title { font-size: 1rem; }
+    .header-badge { font-size: 0.7rem; padding: 3px 8px; }
+}
+
+    @media (max-width: 768px) {
     :root {
         --sidebar-w: 0px;
+        --header-h: 56px;
     }
 
     .sidebar {
         transform: translateX(-100%);
         transition: transform var(--transition);
+        width: 240px;
+        position: fixed;
+        top: 0; left: 0;
+        height: 100dvh; 
+        height: 100vh;  
+        display: flex;
+        flex-direction: column;
     }
 
     .sidebar.open {
         transform: translateX(0);
-        --sidebar-w: 240px;
+        /* --sidebar-w: 240px; */
+    }
+
+    .sidebar .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+    }
+
+    .sidebar .sidebar-user {
+        flex-shrink: 0;
+        position: relative; 
     }
 
     .main-content {
@@ -1111,10 +1170,24 @@ ul {
 
     .header {
         left: 0;
+        padding: 0 16px; 
+        gap: 8px;
     }
+
+    .header-sub { display: none; }
+    .header-title { font-size: 1rem; }
 
     .page-content {
         padding: 16px;
+        margin-top: var(--header-h);
+    }
+
+    .app-footer {
+        padding: 12px 16px;
+        flex-direction: column;
+        text-align: center;
+        gap: 4px;
+        font-size: 0.7rem;
     }
 
     .form-row {
@@ -1123,9 +1196,57 @@ ul {
 
     .stat-grid {
         grid-template-columns: 1fr 1fr;
+        gap: 10px;
     }
+    .stat-card { padding: 14px; }
+    .stat-card-value { font-size: 20px; }
+    .card { padding: 16px; }
+    .auth-card { padding: 28px 20px; }
+    .toolbar { gap: 8px; }
 
     body.sidebar-open {
         overflow: hidden;
+         position: fixed;
+        width: 100%;
     }
 }
+
+@media (max-width: 480px) {
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    .modal { max-height: 95vh; }
+    .auth-card { padding: 24px 16px; }
+    .auth-title { font-size: 18px; }
+    .btn-lg { padding: 10px 20px; font-size: 14px; }
+    .table { font-size: 13px; }
+    .table th, .table td { padding: 10px; }
+}
+ 
+
+/* ══ LIGHT THEME ══ */
+[data-theme="light"] {
+  --bg-primary: #f1f5f9;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #f8fafc;
+  --bg-input: #f1f5f9;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border: rgba(0, 0, 0, 0.08);
+  --border-focus: rgba(5, 150, 105, 0.4);
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .sidebar {
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .header {
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .card {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+

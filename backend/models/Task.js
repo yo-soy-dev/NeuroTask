@@ -25,6 +25,17 @@ const taskSchema = new mongoose.Schema(
       enum: ['low', 'medium', 'high', 'critical'],
       default: 'medium',
     },
+    category: {
+      type: String,
+      enum: ['general', 'bug', 'feature', 'design', 'devops', 'documentation', 'testing', 'research'],
+      default: 'general',
+    },
+    progress: {
+      type: Number,
+      min: 0,
+      max: 100,
+      default: 0
+    },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -47,14 +58,33 @@ const taskSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    attachments: [
+      {
+        filename: String,
+        originalName: String,
+        url: String,
+        publicId: String,
+        size: Number,
+        mimetype: String,
+        uploadedBy: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User'
+        },
+        uploadedAt: {
+          type: Date,
+          default: Date.now
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
 
 // Set completedAt when status changes to completed
 taskSchema.pre('save', function () {
-  if (this.isModified('status') && this.status === 'completed' && !this.completedAt) {
-    this.completedAt = new Date();
+  if (this.isModified('status') && this.status === 'completed') {
+    if (!this.completedAt) this.completedAt = new Date();
+    this.progress = 100;
   }
   if (this.isModified('status') && this.status !== 'completed') {
     this.completedAt = null;
@@ -66,6 +96,7 @@ taskSchema.index({ title: 'text', description: 'text' });
 taskSchema.index({ status: 1, priority: 1 });
 taskSchema.index({ assignedTo: 1 });
 taskSchema.index({ createdBy: 1 });
+taskSchema.index({ category: 1 });
 
 const Task = mongoose.model('Task', taskSchema);
 

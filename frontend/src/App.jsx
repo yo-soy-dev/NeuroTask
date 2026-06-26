@@ -10,6 +10,8 @@ import DashboardPage from './pages/DashboardPage';
 import TasksPage from './pages/TasksPage';
 import UsersPage from './pages/UsersPage';
 import ProfilePage from './pages/ProfilePage';
+import ActivityPage from './pages/ActivityPage';
+
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -41,6 +43,7 @@ const AppRoutes = () => (
       <Route path="tasks" element={<TasksPage />} />
       <Route path="users" element={<AdminRoute><UsersPage /></AdminRoute>} />
       <Route path="profile" element={<ProfilePage />} />
+      <Route path="activity" element={<AdminRoute><ActivityPage /></AdminRoute>} />
     </Route>
     <Route path="*" element={<Navigate to="/dashboard" replace />} />
   </Routes>

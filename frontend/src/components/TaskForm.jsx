@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { userAPI } from '../services/api';
 
-const INITIAL = { title: '', description: '', status: 'todo', priority: 'medium', assignedTo: '', dueDate: '', tags: '' };
+const INITIAL = {
+  title: '', description: '', status: 'todo', priority: 'medium',
+  category: 'general', progress: 0, assignedTo: '', dueDate: '', tags: '',
+};
+
+const CATEGORIES = ['general', 'bug', 'feature', 'design', 'devops', 'documentation', 'testing', 'research'];
 
 const TaskForm = ({ onSubmit, initialData, loading }) => {
   const [form, setForm] = useState(INITIAL);
@@ -14,17 +19,19 @@ const TaskForm = ({ onSubmit, initialData, loading }) => {
         description: initialData.description || '',
         status: initialData.status || 'todo',
         priority: initialData.priority || 'medium',
+        category: initialData.category || 'general',
+        progress: initialData.progress ?? 0,
         assignedTo: initialData.assignedTo?._id || '',
         dueDate: initialData.dueDate ? initialData.dueDate.slice(0, 10) : '',
         tags: Array.isArray(initialData.tags) ? initialData.tags.join(', ') : '',
       });
+    } else {
+      setForm(INITIAL);
     }
   }, [initialData]);
 
   useEffect(() => {
-    userAPI.getAll({ limit: 100 })
-      .then(({ data }) => setUsers(data.data.users))
-      .catch(() => {});
+    userAPI.getAll({ limit: 100 }).then(({ data }) => setUsers(data.data.users)).catch(() => { });
   }, []);
 
   const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
@@ -33,9 +40,15 @@ const TaskForm = ({ onSubmit, initialData, loading }) => {
     e.preventDefault();
     const payload = {
       ...form,
+      progress: parseInt(form.progress) || 0,
       assignedTo: form.assignedTo || null,
       dueDate: form.dueDate || null,
-      tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+      tags: form.tags 
+      ? form.tags
+      .split(',')
+      .map(t => t.trim().toLowerCase())
+      .filter(Boolean) 
+      : [],
     };
     onSubmit(payload);
   };
@@ -72,23 +85,44 @@ const TaskForm = ({ onSubmit, initialData, loading }) => {
       </div>
       <div className="form-row">
         <div className="form-group">
+          <label className="form-label">Category</label>
+          <select name="category" className="form-select" value={form.category} onChange={handleChange}>
+            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="form-group">
           <label className="form-label">Assign To</label>
           <select name="assignedTo" className="form-select" value={form.assignedTo} onChange={handleChange}>
             <option value="">— Unassigned —</option>
             {users.map(u => <option key={u._id} value={u._id}>{u.name} ({u.role})</option>)}
           </select>
         </div>
+      </div>
+
+      <div className="form-group">
+        <label className="form-label">
+          Progress <span style={{ marginLeft: 8, color: 'var(--accent-light)', fontWeight: 700 }}>{form.progress}%</span>
+        </label>
+        <input name="progress" type="range" min="0" max="100" step="5"
+          value={form.progress} onChange={handleChange}
+          style={{ width: '100%', accentColor: 'var(--accent)', cursor: 'pointer' }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>
+          <span>0%</span><span>50%</span><span>100%</span>
+        </div>
+      </div>
+
+      <div className="form-row">
         <div className="form-group">
           <label className="form-label">Due Date</label>
           <input name="dueDate" type="date" className="form-input" value={form.dueDate} onChange={handleChange} />
         </div>
+        <div className="form-group">
+          <label className="form-label">Tags <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(comma-separated)</span></label>
+          <input name="tags" className="form-input" placeholder="frontend, bug, urgent" value={form.tags} onChange={handleChange} />
+        </div>
       </div>
-      <div className="form-group">
-        <label className="form-label">Tags <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(comma-separated)</span></label>
-        <input name="tags" className="form-input" placeholder="frontend, bug, urgent" value={form.tags} onChange={handleChange} />
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 4 }}>
-        <button type="submit" className="btn btn-primary" disabled={loading}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+        <button type="submit" className="btn btn-primary" disabled={loading || !form.title.trim()}>
           {loading ? 'Saving...' : initialData ? 'Update Task' : 'Create Task'}
         </button>
       </div>

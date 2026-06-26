@@ -42,6 +42,16 @@ export const taskAPI = {
   create: (data) => API.post('/tasks', data),
   update: (id, data) => API.put(`/tasks/${id}`, data),
   delete: (id) => API.delete(`/tasks/${id}`),
+  export: () => API.get('/tasks/export', { responseType: 'blob' }),
+  uploadAttachment: (id, formData) => API.post(`/tasks/${id}/attachments`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  deleteAttachment: (taskId, attachmentId) => API.delete(`/tasks/${taskId}/attachments/${attachmentId}`),
+  getComments: (taskId) => API.get(`/tasks/${taskId}/comments`),
+  addComment: (taskId, text) => API.post(`/tasks/${taskId}/comments`, { text }),
+};
+
+export const commentAPI = {
+  edit: (id, text) => API.put(`/comments/${id}`, { text }),
+  delete: (id) => API.delete(`/comments/${id}`),
 };
 
 // ─── Users ─────────────────────────────────────
@@ -52,6 +62,19 @@ export const userAPI = {
   create: (data) => API.post('/users', data),
   update: (id, data) => API.put(`/users/${id}`, data),
   delete: (id) => API.delete(`/users/${id}`),
+};
+
+// ─── Notifications ─────────────────────────────────────
+export const notificationAPI = {
+  getAll: (params) => API.get('/notifications', { params }),
+  markAsRead: (id) => API.put(`/notifications/${id}/read`),
+  markAllAsRead: () => API.put('/notifications/read-all'),
+  delete: (id) => API.delete(`/notifications/${id}`),
+};
+ 
+// ─── Activity ─────────────────────────────────────
+export const activityAPI = {
+  getAll: (params) => API.get('/activity', { params }),
 };
 
 export default API;

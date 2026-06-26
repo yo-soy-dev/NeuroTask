@@ -3,12 +3,15 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import logo from '../assets/taskflow.png';
+import NotificationBell from './NotificationBell';
+import useTheme from '../hooks/useTheme';
 
 
 const NAV = [
     { label: 'Dashboard', icon: '⊞', path: '/dashboard', section: 'Main' },
     { label: 'My Tasks', icon: '✓', path: '/tasks', section: 'Main' },
     { label: 'Users', icon: '👥', path: '/users', section: 'Admin', adminOnly: true },
+    { label: 'Activity Log', icon: '📋', path: '/activity', section: 'Admin', adminOnly: true },
     { label: 'Profile', icon: '⚙', path: '/profile', section: 'Account' },
 ];
 
@@ -16,6 +19,7 @@ const PAGE_TITLES = {
     '/dashboard': 'Dashboard',
     '/tasks': 'My Tasks',
     '/users': 'Users',
+    '/activity': 'Activity Log',
     '/profile': 'Profile',
 };
 
@@ -27,6 +31,7 @@ const Layout = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { isDark, toggleTheme } = useTheme();
 
     useEffect(() => {
         document.body.classList.toggle('sidebar-open', sidebarOpen);
@@ -35,7 +40,7 @@ const Layout = () => {
 
     const handleLogout = () => {
         logout();
-        toast.info('Logged out successfully.');
+        toast.success('Logged out successfully.');
         navigate('/login');
     };
 
@@ -113,6 +118,14 @@ const Layout = () => {
                         </div>
                     </div>
                     <div className="header-right">
+                        <button
+                            className="btn btn-ghost btn-icon"
+                            onClick={toggleTheme}
+                            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                            style={{ fontSize: 18 }} >
+                            {isDark ? '☀️' : '🌙'}
+                        </button>
+                        <NotificationBell />
                         <div className="header-badge">
                             <span className="header-badge-dot" />
                             {user?.role === 'admin' ? 'Admin' : 'Employee'}

@@ -15,6 +15,17 @@ const StatCard = ({ icon, label, value, color, onClick }) => (
   </div>
 );
 
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload?.length) {
+    return (
+      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
+        <strong style={{ textTransform: 'capitalize' }}>{payload[0].name}</strong>: {payload[0].value}
+      </div>
+    );
+  }
+  return null;
+};
+
 const DashboardPage = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,34 +43,24 @@ const DashboardPage = () => {
 
   const statusData = stats ? Object.entries(stats.byStatus).map(([name, value]) => ({ name, value })) : [];
   const priorityData = stats ? Object.entries(stats.byPriority).map(([name, value]) => ({ name, value })) : [];
-
   const completionRate = stats?.total > 0 ? Math.round((stats.byStatus.completed / stats.total) * 100) : 0;
 
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload?.length) {
-      return (
-        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', fontSize: 13 }}>
-          <strong style={{ textTransform: 'capitalize' }}>{payload[0].name}</strong>: {payload[0].value}
-        </div>
-      );
-    }
-    return null;
-  };
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
 
   return (
     <div>
-      {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>
-          Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.name?.split(' ')[0]} 👋
+          Good {greeting}, {user?.name?.split(' ')[0]} 👋
         </h1>
         <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>
-          {isAdmin ? 'Here\'s an overview of all tasks in the system.' : 'Here\'s a summary of your tasks.'}
+          {isAdmin ? "Here's an overview of all tasks in the system." : "Here's a summary of your tasks."}
         </p>
       </div>
 
       {/* Stat Cards */}
-      <div className="stat-grid" style={{ marginBottom: 24, gridTemplateColumns: 'repeat(2, 1fr)' }}>
+      <div className="stat-grid" style={{ marginBottom: 24, gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
         <StatCard icon="📋" label="Total Tasks" value={stats?.total || 0} color="var(--accent-light)" onClick={() => navigate('/tasks')} />
         <StatCard icon="⏳" label="In Progress" value={stats?.byStatus['in-progress'] || 0} color="var(--info)" />
         <StatCard icon="✅" label="Completed" value={stats?.byStatus.completed || 0} color="var(--success)" />
@@ -69,8 +70,6 @@ const DashboardPage = () => {
 
       {/* Charts */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))', gap: 20, marginBottom: 24 }}>
-
-        {/* Status Pie */}
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">Tasks by Status</h3>
@@ -79,9 +78,7 @@ const DashboardPage = () => {
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
                 <Pie data={statusData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} paddingAngle={3} dataKey="value">
-                  {statusData.map((entry) => (
-                    <Cell key={entry.name} fill={STATUS_COLORS[entry.name]} />
-                  ))}
+                  {statusData.map((entry) => <Cell key={entry.name} fill={STATUS_COLORS[entry.name]} />)}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
                 <Legend formatter={(v) => <span style={{ color: 'var(--text-secondary)', textTransform: 'capitalize', fontSize: 12 }}>{v.replace('-', ' ')}</span>} />
@@ -92,7 +89,6 @@ const DashboardPage = () => {
           )}
         </div>
 
-        {/* Priority Bar */}
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">Tasks by Priority</h3>
@@ -100,13 +96,11 @@ const DashboardPage = () => {
           {stats?.total > 0 ? (
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={priorityData} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
-                <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 12, textTransform: 'capitalize' }} axisLine={false} tickLine={false} />
+                <XAxis dataKey="name" tick={{ fill: 'var(--text-muted)', fontSize: 12 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                 <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                  {priorityData.map((entry) => (
-                    <Cell key={entry.name} fill={PRIORITY_COLORS[entry.name]} />
-                  ))}
+                  {priorityData.map((entry) => <Cell key={entry.name} fill={PRIORITY_COLORS[entry.name]} />)}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
@@ -116,7 +110,7 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Status Summary */}
+      {/* Status Breakdown */}
       <div className="card">
         <div className="card-header">
           <h3 className="card-title">Status Breakdown</h3>
