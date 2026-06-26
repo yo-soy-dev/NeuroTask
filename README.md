@@ -25,9 +25,17 @@
 | 👥 Role-Based Access | Separate Admin & Employee permissions |
 | 📊 Dashboard | Charts and real-time task statistics |
 | ✅ Task CRUD | Create, view, edit, delete tasks with full validation |
-| 🔍 Search & Filter | Filter by status, priority with pagination |
+| 🔍 Search & Filter | Filter by status, priority, category with pagination |
 | 👤 User Management | Admin can create, edit, deactivate users |
-| 📱 Responsive UI | Clean dark UI that works on all screen sizes |
+| 💬 Task Comments | Team discussion on each task |
+| 📎 File Attachments | Upload files/images via Cloudinary |
+| 📋 Activity Log | Track all system actions (Admin) |
+| 🔔 Notifications | Real-time bell notifications |
+| 📊 Task Progress | Progress slider 0–100% |
+| 🏷️ Categories & Tags | Organize tasks by category and tags |
+| ⬇️ Export CSV | Download tasks as spreadsheet |
+| ☀️ Dark / Light Mode | Toggle between themes |
+| 📱 Responsive UI | Works on mobile, tablet, and desktop |
 | ⚡ Error Handling | Proper validation and error responses throughout |
 
 ---
@@ -45,49 +53,66 @@
 
 ```
 mern-task-manager/
-├── server/                      # Node.js + Express Backend
+├── backend/                         # Node.js + Express Backend
 │   ├── config/
-│   │   └── db.js                # MongoDB connection
+│   │   ├── db.js                    # MongoDB connection
+│   │   └── cloudinary.js            # Cloudinary setup
 │   ├── controllers/
 │   │   ├── authController.js
 │   │   ├── taskController.js
-│   │   └── userController.js
+│   │   ├── userController.js
+│   │   ├── commentController.js
+│   │   ├── notificationController.js
+│   │   └── activityController.js
 │   ├── middleware/
-│   │   ├── auth.js              # JWT protect & role guard
+│   │   ├── auth.js                  # JWT protect & role guard
 │   │   ├── errorHandler.js
-│   │   └── validate.js
+│   │   ├── validate.js
+│   │   └── upload.js                # Multer file handler
 │   ├── models/
 │   │   ├── User.js
-│   │   └── Task.js
+│   │   ├── Task.js
+│   │   ├── Comment.js
+│   │   ├── Notification.js
+│   │   └── Activity.js
 │   ├── routes/
 │   │   ├── authRoutes.js
 │   │   ├── taskRoutes.js
-│   │   └── userRoutes.js
+│   │   ├── userRoutes.js
+│   │   ├── commentRoutes.js
+│   │   ├── notificationRoutes.js
+│   │   └── activityRoutes.js
 │   ├── utils/
 │   │   ├── jwt.js
-│   │   └── response.js
-│   ├── seed.js                  # Demo data seeder
+│   │   ├── response.js
+│   │   └── activity.js              # Log & notify helpers
+│   ├── seed.js                      # Demo data seeder
 │   ├── server.js
 │   └── .env.example
 │
-├── client/                      # React Frontend
+├── frontend/                        # React Frontend
 │   └── src/
 │       ├── assets/
 │       ├── components/
-│       │   ├── common/          # Modal, Pagination, Badge, etc.
-│       │   ├── tasks/           # TaskForm
-│       │   └── users/           # UserForm
+│       │   ├── common/              # Modal, Pagination, Badge, Layout
+│       │   ├── tasks/               # TaskForm, AttachmentSection
+│       │   ├── comments/            # CommentSection
+│       │   ├── notifications/       # NotificationBell
+│       │   └── users/               # UserForm
 │       ├── context/
-│       │   └── AuthContext.js   # Global auth state
+│       │   └── AuthContext.js
+│       ├── hooks/
+│       │   └── useTheme.js          # Dark/Light mode
 │       ├── pages/
 │       │   ├── DashboardPage.jsx
 │       │   ├── TasksPage.jsx
 │       │   ├── UsersPage.jsx
+│       │   ├── ActivityPage.jsx
 │       │   ├── LoginPage.jsx
 │       │   ├── RegisterPage.jsx
 │       │   └── ProfilePage.jsx
 │       └── services/
-│           └── api.js           # Axios instance + API calls
+│           └── api.js               # Axios instance + all API calls
 │
 ├── .gitignore
 ├── package.json
@@ -101,6 +126,7 @@ mern-task-manager/
 ### Prerequisites
 - Node.js v18+
 - MongoDB (local or Atlas)
+- Cloudinary account (free)
 - npm or yarn
 
 ### 1. Clone the repository
@@ -111,17 +137,24 @@ cd mern-task-manager
 
 ### 2. Setup Backend
 ```bash
-cd server
+cd backend
 npm install
 cp .env.example .env
 ```
 
 Edit `.env`:
 ```env
+PORT=5000
 MONGO_URI=mongodb://localhost:27017/task_manager
 JWT_SECRET=your_super_secret_key
-PORT=5000
+JWT_EXPIRE=7d
 NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+
+# Cloudinary (for file attachments)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 ```
 
 ### 3. Seed Demo Data (optional but recommended)
@@ -131,7 +164,7 @@ node seed.js
 
 ### 4. Setup Frontend
 ```bash
-cd ../client
+cd ../frontend
 npm install
 ```
 
@@ -143,10 +176,10 @@ Open **two terminals**:
 
 ```bash
 # Terminal 1 — Backend (http://localhost:5000)
-cd server && npm run dev
+cd backend && npm run dev
 
 # Terminal 2 — Frontend (http://localhost:5173)
-cd client && npm run dev
+cd frontend && npm run dev
 ```
 
 Then open **[http://localhost:5173](http://localhost:5173)**
@@ -169,10 +202,21 @@ Then open **[http://localhost:5173](http://localhost:5173)**
 |--------|----------|--------|-------------|
 | GET | `/` | Private | Get all tasks (search, filter, paginate) |
 | GET | `/stats` | Private | Get task statistics |
+| GET | `/export` | Private | Export tasks as CSV |
 | GET | `/:id` | Private | Get single task |
 | POST | `/` | Admin | Create task |
 | PUT | `/:id` | Private | Update task |
 | DELETE | `/:id` | Admin | Delete task |
+| POST | `/:id/attachments` | Private | Upload file attachment |
+| DELETE | `/:id/attachments/:aid` | Private | Delete attachment |
+| GET | `/:id/comments` | Private | Get task comments |
+| POST | `/:id/comments` | Private | Add comment |
+
+### Comments — `/api/comments`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| PUT | `/:id` | Private | Edit comment |
+| DELETE | `/:id` | Private | Delete comment |
 
 ### Users — `/api/users`
 | Method | Endpoint | Access | Description |
@@ -183,6 +227,19 @@ Then open **[http://localhost:5173](http://localhost:5173)**
 | POST | `/` | Admin | Create user |
 | PUT | `/:id` | Admin | Update user |
 | DELETE | `/:id` | Admin | Delete user |
+
+### Notifications — `/api/notifications`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/` | Private | Get my notifications |
+| PUT | `/read-all` | Private | Mark all as read |
+| PUT | `/:id/read` | Private | Mark one as read |
+| DELETE | `/:id` | Private | Delete notification |
+
+### Activity — `/api/activity`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/` | Private | Get activity log |
 
 ---
 
@@ -197,6 +254,8 @@ Then open **[http://localhost:5173](http://localhost:5173)**
 | bcryptjs | Password hashing |
 | express-validator | Request validation |
 | morgan | HTTP request logger |
+| cloudinary | File/image cloud storage |
+| multer | File upload handling |
 
 ### Frontend
 | Package | Purpose |
@@ -225,6 +284,16 @@ Then open **[http://localhost:5173](http://localhost:5173)**
 - [x] Database seeder for demo data
 - [x] Environment variable configuration
 
+### 🎁 Bonus Features
+- [x] Task Comments (team collaboration)
+- [x] File Attachments via Cloudinary
+- [x] Activity Log (audit trail)
+- [x] Real-time Notifications Bell
+- [x] Task Progress % tracker
+- [x] Task Categories & Tags
+- [x] Export Tasks to CSV
+- [x] Dark / Light Mode toggle
+
 ---
 
 ## 🚀 Deployment
@@ -232,8 +301,9 @@ Then open **[http://localhost:5173](http://localhost:5173)**
 | Service | Purpose | URL |
 |---------|---------|-----|
 | Vercel | Frontend hosting | [task-flow-xi-hazel.vercel.app](https://task-flow-xi-hazel.vercel.app) |
-| Render | Backend API | [https://taskflow-backend-a0x2.onrender.com](https://taskflow-backend-a0x2.onrender.com) |
+| Render | Backend API | [taskflow-backend-a0x2.onrender.com](https://taskflow-backend-a0x2.onrender.com) |
 | MongoDB Atlas | Cloud database | — |
+| Cloudinary | File storage | — |
 
 ---
 
