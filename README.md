@@ -21,7 +21,7 @@
 
 ## Overview
 
-TaskFlow is a full-stack MERN application built for teams to create, assign, and track tasks efficiently. It enforces a strict two-tier permission model — admins control everything, employees manage their own workload — backed by JWT authentication, bcrypt password hashing, and server-side role guards on every protected route.
+NeuroTask is a full-stack MERN application built for teams to create, assign, and track tasks efficiently. It enforces a strict two-tier permission model — admins control everything, employees manage their own workload — backed by JWT authentication, bcrypt password hashing, and server-side role guards on every protected route.
 
 The project is deployed on Vercel (frontend) and Render (backend), with MongoDB Atlas as the cloud database and Cloudinary for file storage.
 
@@ -206,8 +206,8 @@ secure_url stored → served directly from Cloudinary CDN
 ### 1. Clone
 
 ```bash
-git clone https://github.com/yo-soy-dev/TaskFlow.git
-cd TaskFlow
+git clone https://github.com/yo-soy-dev/NeuroTask.git
+cd NeuroTask
 ```
 
 ### 2. Backend setup
@@ -259,7 +259,7 @@ cd frontend && npm run dev     # → http://localhost:5173
 ## Project Structure
 
 ```
-TaskFlow/
+NeuroTask/
 ├── backend/
 │   ├── config/
 │   │   ├── db.js                    # MongoDB connection
