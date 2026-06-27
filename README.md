@@ -2,7 +2,7 @@
 
 <img src="./frontend/src/assets/taskflow.png" alt="TaskFlow Logo" width="88" style="border-radius: 16px" />
 
-# TaskFlow
+# NeuroTask
 
 **A production-ready task management system with role-based access control**
 
@@ -13,7 +13,7 @@
 [![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev)
 [![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](https://cloudinary.com)
 
-[🚀 Live Demo](https://task-flow-xi-hazel.vercel.app) · [📡 API Health](https://taskflow-backend-a0x2.onrender.com/api/health) · [🐛 Report Bug](https://github.com/yo-soy-dev/TaskFlow/issues)
+[🚀 Live Demo](https://task-flow-xi-hazel.vercel.app) · [📡 API Health](https://taskflow-backend-a0x2.onrender.com/api/health) · [🐛 Report Bug](https://github.com/yo-soy-dev/NeuroTask/issues)
 
 </div>
 
