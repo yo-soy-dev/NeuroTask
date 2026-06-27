@@ -1120,7 +1120,7 @@ ul {
 /* ── Responsive ─────────────────────────────────── */
 @media (max-width: 1024px) and (min-width: 769px) {
     :root {
-        --sidebar-w: 200px;
+        --sidebar-w: 220px;
     }
 
     .page-content {
@@ -1155,6 +1155,7 @@ ul {
     }
 
     .sidebar {
+        width: 220px;
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -1176,6 +1177,9 @@ ul {
 
     .sidebar-user-name {
         font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .sidebar-user-role {
@@ -1185,23 +1189,33 @@ ul {
     .sidebar-logo {
         padding: 16px 14px 12px;
         gap: 8px;
+        flex-shrink: 0;
+        min-height: 64px;
     }
 
     .sidebar-logo-text {
-        font-size: 13px;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .sidebar-logo-sub {
-        font-size: 9px;
+        font-size: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .nav-item {
-        padding: 7px 14px;
+        padding: 7px 12px;
         font-size: 13px;
+        gap: 8px;
     }
 
     .nav-section-label {
-        padding: 3px 14px 1px;
+        padding: 3px 12px 1px;
+        font-size: 9px;
     }
     
 }
